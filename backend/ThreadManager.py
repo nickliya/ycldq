@@ -22,6 +22,9 @@
 """
 from PyQt5 import QtCore
 from PyQt5.QtCore import *
+from pynput import keyboard
+from pynput.keyboard import Key, Controller
+import time
 
 
 def rescheck(func):
@@ -114,3 +117,62 @@ class AdbThdCommom(AdbThread):
 
         self.btn.setEnabled(True)
 
+
+class KeyboardMonitor(AdbThread):
+    def __init__(self):
+        """
+        线程类
+        """
+        super(KeyboardMonitor, self).__init__()
+        self.signals = WorkerSignals()
+
+    def run(self):
+
+        # Collect events until released
+        with keyboard.Listener(
+                on_press=self.on_press,
+                on_release=self.on_release) as listener:
+            listener.join()
+
+        # ...or, in a non-blocking fashion:
+        listener = keyboard.Listener(
+            on_press=self.on_press,
+            on_release=self.on_release)
+        listener.start()
+
+    def on_press(self, key):
+        try:
+            # print('alphanumeric key {0} pressed'.format(key.char))
+            self.signals.recv_signal.emit(str(key))
+        except AttributeError:
+            print('special key {0} pressed'.format(key))
+
+    def on_release(self, key):
+        # print('{0} released'.format(key))
+        if key == keyboard.Key.esc:
+            # Stop listener
+            return False
+
+
+class KeyboardInput(AdbThread):
+    def __init__(self, wait_time, input_key):
+        """
+        线程类
+        """
+        super(KeyboardInput, self).__init__()
+        self.signals = WorkerSignals()
+        self.keyboard = Controller()
+        self.index = True
+        self.time = wait_time
+        self.input_key = input_key
+
+    def run(self):
+        # Collect events until released
+        while self.index:
+            self.keyboard.press(self.input_key)
+            self.keyboard.release(self.input_key)
+            time.sleep(self.time)
+
+    def stop(self):
+        # Collect events until released
+        self.index = False

@@ -28,18 +28,6 @@ import time
 import os
 
 
-def rescheck(func):
-    def wrapper(self, *args, **kwargs):
-        proc = func(self)
-        errmsg = proc.stderr.read().decode('gbk')
-        if errmsg:
-            self.adbmsgbrs.setText(errmsg)
-        else:
-            self.adbmsgbrs.setText(proc.stdout.read())
-
-    return wrapper
-
-
 def gettime():
     timer = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())
     return timer
@@ -54,36 +42,36 @@ class AdbTools(AdbToolsView):
 
         self.logcat_thd = None
 
-    def filladbmsg(self, message):
-        if 'no devices/emulators found' in message:
-            QMessageBox.information(self, 'info', '无法检测到设备', QMessageBox.Yes, QMessageBox.Yes)
-        self.adbmsgbrs.append(message)
+    def input_key(self, message):
+        # print(message)
+        if message == "Key.f7":
+            self.key_input()
+        elif message == "Key.f8":
+            self.key_stop()
 
     def adbroot(self):
-        cmd = 'adb root'
-        root_thd = AdbThdCommom(cmd, self.rootbtn)
-        root_thd.signals.recv_signal.connect(self.filladbmsg)
-        self.adbmsgbrs.clear()
-        self.threadpool.start(root_thd)
+        print(self.line_edit1.text())
 
-    def adbremount(self):
-        cmd = 'adb remount'
-        remount_thd = AdbThdCommom(cmd, self.remountbtn)
-        remount_thd.signals.recv_signal.connect(self.filladbmsg)
-        self.adbmsgbrs.clear()
-        self.threadpool.start(remount_thd)
+    def key_input(self):
+        wait_time = float(self.line_edit1.text())
+        self.input_thd1 = KeyboardInput(wait_time, "1")
+        self.input_thd2 = KeyboardInput(wait_time, "2")
+        self.input_thd3 = KeyboardInput(wait_time, "3")
+        # input_thd.signals.recv_signal.connect(self.filladbmsg)
+        self.threadpool.start(self.input_thd1)
+        self.threadpool.start(self.input_thd2)
+        self.threadpool.start(self.input_thd3)
 
-    def screenshoot(self):
-        scrennshoot_thd = AdbThdScreenShoot(self.screenshootbtn)
-        scrennshoot_thd.signals.recv_signal.connect(self.filladbmsg)
-        self.adbmsgbrs.clear()
-        self.threadpool.start(scrennshoot_thd)
+    def key_stop(self):
+        self.input_thd1.stop()
+        self.input_thd2.stop()
+        self.input_thd3.stop()
+
+    def key_monitor(self):
+        monitor_thd = KeyboardMonitor()
+        monitor_thd.signals.recv_signal.connect(self.input_key)
+        self.threadpool.start(monitor_thd)
 
     def bindfun(self):
-        # self.rootbtn.clicked.connect(self.adbroot)
-        # self.remountbtn.clicked.connect(self.adbremount)
-        # self.devicesbtn.clicked.connect(self.adbdevices)
-        #
-        # self.get_btnlist["btn_navi"].clicked.connect(lambda: self.getxlog(self.get_btnlist["btn_navi"]))
-        #
+        self.save_btn.clicked.connect(self.adbroot)
         pass

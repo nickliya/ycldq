@@ -50,7 +50,7 @@ class AdbToolsView(QWidget):
         self.checkbox4 = QCheckBox('有效')
 
         # edit
-        self.line_edit1 = QLineEdit('1')
+        self.line_edit1 = QLineEdit('0.1')
         self.line_edit2 = QLineEdit('2')
         self.line_edit3 = QLineEdit('3')
         self.line_edit4 = QLineEdit('4')

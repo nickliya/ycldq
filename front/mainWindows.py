@@ -48,6 +48,7 @@ class MainWidget(QMainWindow):
         self.ini_grid()
         self.init_menu()
 
+
     def center(self):
         """控件居中"""
         qr = self.frameGeometry()
@@ -91,3 +92,5 @@ class MainWidget(QMainWindow):
         self.maingrid.setRowStretch(0, 0)
         self.maingrid.addWidget(self.dataprocessing, 0, 0)
 
+    def showEvent(self, event):
+        self.dataprocessing.key_monitor()

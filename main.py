@@ -35,8 +35,8 @@ def main():
 
 
 if __name__ == '__main__':
-    log_info = open('Temp/info.log', 'w')
-    log_err = open('Temp/error.log', 'w')
-    sys.stdout = log_info
-    sys.stderr = log_err
+    # log_info = open('Temp/info.log', 'w')
+    # log_err = open('Temp/error.log', 'w')
+    # sys.stdout = log_info
+    # sys.stderr = log_err
     main()
