@@ -20,8 +20,11 @@
 # 2019/11/4                 yangqing             Create it.
 #
 """
-from PyQt5.QtWidgets import QAction, QMainWindow, QDesktopWidget, QGridLayout, QWidget
+import sys
+
+from PyQt5.QtWidgets import QAction, QMainWindow, QDesktopWidget, QGridLayout, QWidget,QApplication
 from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import QCoreApplication
 from backend.adbTools import AdbTools
 
 import cgitb
@@ -47,7 +50,6 @@ class MainWidget(QMainWindow):
         self.init_ui()
         self.ini_grid()
         self.init_menu()
-
 
     def center(self):
         """控件居中"""
@@ -94,3 +96,7 @@ class MainWidget(QMainWindow):
 
     def showEvent(self, event):
         self.dataprocessing.key_monitor()
+
+    def closeEvent(self, event):
+        for i in self.dataprocessing.thd_list:
+            i.stop()
